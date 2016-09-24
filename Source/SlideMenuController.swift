@@ -21,7 +21,7 @@ import UIKit
 public struct SlideMenuOptions {
     public static var leftViewWidth: CGFloat = 270.0
     public static var leftBezelWidth: CGFloat? = 16.0
-    public static var contentViewScale: CGFloat = 0.96
+    public static var contentViewScale: CGFloat = 1.0
     public static var contentViewOpacity: CGFloat = 0.5
     public static var contentViewDrag: Bool = false
     public static var shadowOpacity: CGFloat = 0.0
@@ -193,16 +193,17 @@ open class SlideMenuController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     open override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
-        if let mainController = self.mainViewController{
-            return mainController.supportedInterfaceOrientations
-        }
-        return UIInterfaceOrientationMask.all
+        return mainViewController?.supportedInterfaceOrientations ?? UIInterfaceOrientationMask.portrait;
     }
     
     open override var shouldAutorotate : Bool {
         return mainViewController?.shouldAutorotate ?? false
     }
-        
+    
+    open override var preferredInterfaceOrientationForPresentation : UIInterfaceOrientation {
+        return mainViewController?.preferredInterfaceOrientationForPresentation ?? UIInterfaceOrientation.portrait;
+    }
+
     open override func viewWillLayoutSubviews() {
         // topLayoutGuideの値が確定するこのタイミングで各種ViewControllerをセットする
         setUpViewController(mainContainerView, targetViewController: mainViewController)
@@ -883,8 +884,8 @@ open class SlideMenuController: UIViewController, UIGestureRecognizerDelegate {
     fileprivate func setOpenWindowLevel() {
         if (SlideMenuOptions.hideStatusBar) {
             DispatchQueue.main.async(execute: {
-                if let window = UIApplication.shared.keyWindow {
-                    window.windowLevel = UIWindowLevelStatusBar + 1
+                if let window = UIApplication.shared.delegate?.window {
+                    window!.windowLevel = UIWindowLevelStatusBar + 1
                 }
             })
         }
@@ -893,8 +894,8 @@ open class SlideMenuController: UIViewController, UIGestureRecognizerDelegate {
     fileprivate func setCloseWindowLevel() {
         if (SlideMenuOptions.hideStatusBar) {
             DispatchQueue.main.async(execute: {
-                if let window = UIApplication.shared.keyWindow {
-                    window.windowLevel = UIWindowLevelNormal
+                if let window = UIApplication.shared.delegate?.window {
+                    window!.windowLevel = UIWindowLevelNormal
                 }
             })
         }
